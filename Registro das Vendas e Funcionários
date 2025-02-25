@@ -1,8 +1,8 @@
 * 25/02/2025
 
-COLETAR OS DADOS DAS VENDAS E GRAVAR NO BANCO DE DADOS MONGO DB
+COLETAR OS DADOS DAS VENDAS E INFORMAÇÕES DOS FUNCIONÁRIOS E GRAVAR NO BANCO DE DADOS NOSQL - MONGO DB
 
-- CÓDIGO:
+- CÓDIGO PARA COLETAR E GRAVAR AS VENDAS:
 
 import tkinter as tk
 from tkinter import ttk, messagebox
@@ -168,3 +168,23 @@ try:
 
 except Exception as e:
     print(f"Ocorreu um erro ao iniciar a interface gráfica: {e}")
+
+- LEITURA DO BANCO DE DADOS DE VENDAS:
+
+from pymongo import MongoClient
+
+# Conectar ao MongoDB (ajuste a URL se necessário)
+client = MongoClient("mongodb://localhost:27017/")  # Conexão local
+
+# Acessar o banco de dados 'vendas' e a coleção 'registros_vendas'
+db = client['vendas']
+colecao = db['registros_vendas']
+
+# Encontrar todos os registros da coleção
+registros = colecao.find()
+
+# Exibir os dados encontrados
+for registro in registros:
+    print(registro)
+
+- CÓDIGO PARA COLETAR E GRAVAR OS FUNCIONÁRIOS:
