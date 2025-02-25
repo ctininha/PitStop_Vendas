@@ -13,7 +13,7 @@ from pymongo import MongoClient
 # Função para salvar dados no MongoDB
 def salvar_no_banco(dados_venda):
     try:
-        # Conexão com o MongoDB (ajuste a URL se necessário)
+        # Conexão com o MongoDB
         client = MongoClient("mongodb://localhost:27017/")  # Conexão local
         db = client['vendas']  # Banco de dados 'vendas' (será criado se não existir)
         colecao = db['registros_vendas']  # Coleção 'registros_vendas' (será criada se não existir)
@@ -41,6 +41,7 @@ def exibir_dados():
         loja = loja_entry.get()
         status_venda = status_venda_combobox.get()
 
+        # Validar se os campos obrigatórios estão preenchidos
         if not descricao or not quantidade or not valor_venda:
             messagebox.showerror("Erro", "Os campos Descrição, Quantidade e Valor de Venda são obrigatórios.")
             return
@@ -160,8 +161,8 @@ try:
     # Adiciona duas linhas em branco
     tk.Label(root, text="").pack()  # Primeira linha em branco
 
-    # Botão de exibir dados
-    tk.Button(root, text="Salvar Dados", command=exibir_dados).pack()
+    # Botão de Salvar dados
+    tk.Button(root, text="Salvar Venda", command=exibir_dados).pack()
 
     # Inicia o loop principal da interface gráfica
     root.mainloop()
@@ -173,7 +174,7 @@ except Exception as e:
 
 from pymongo import MongoClient
 
-# Conectar ao MongoDB (ajuste a URL se necessário)
+# Conectar ao MongoDB
 client = MongoClient("mongodb://localhost:27017/")  # Conexão local
 
 # Acessar o banco de dados 'vendas' e a coleção 'registros_vendas'
@@ -188,3 +189,188 @@ for registro in registros:
     print(registro)
 
 - CÓDIGO PARA COLETAR E GRAVAR OS FUNCIONÁRIOS:
+
+import tkinter as tk
+from tkinter import ttk, messagebox
+from datetime import datetime
+from pymongo import MongoClient
+
+# Conectar ao MongoDB
+client = MongoClient("mongodb://localhost:27017/")
+db = client['empresa']  # Nome do banco de dados
+funcionarios_collection = db['funcionarios']  # Nome da coleção de funcionários
+
+# Função para salvar os dados no banco de dados
+def salvar_dados_funcionario():
+    try:
+        cpf = cpf_entry.get()
+        nome = nome_entry.get()
+        data_nascimento = data_nascimento_entry.get()
+        logradouro = logradouro_entry.get()
+        bairro = bairro_entry.get()
+        cidade = cidade_entry.get()
+        estado = estado_entry.get()
+        cep = cep_entry.get()
+        departamento_setor = departamento_setor_entry.get()
+        telefone_contato = telefone_contato_entry.get()
+        email = email_entry.get()
+        salario = float(salario_entry.get())  # Convertendo para float
+        beneficios = beneficios_entry.get().split(",")  # Separar benefícios por vírgula
+        cargo = cargo_entry.get()
+        status_funcionario = status_funcionario_combobox.get()
+
+        # Validar se os campos obrigatórios estão preenchidos
+        if not cpf or not nome or not departamento_setor or not telefone_contato:
+            messagebox.showerror("Erro", "Campos obrigatórios não preenchidos!")
+            return
+
+        # Criando o dicionário de dados para ser salvo no MongoDB
+        funcionario = {
+            "cpf": cpf,
+            "nome": nome,
+            "data_nascimento": data_nascimento,
+            "endereco": {
+                "logradouro": logradouro,
+                "bairro": bairro,
+                "cidade": cidade,
+                "estado": estado,
+                "cep": cep
+            },
+            "departamento_setor": departamento_setor,
+            "telefone_contato": telefone_contato,
+            "email": email,
+            "salario": salario,
+            "beneficios": beneficios,
+            "cargo": cargo,
+            "status_funcionario": status_funcionario
+        }
+
+        # Inserir o documento na coleção 'funcionarios'
+        funcionarios_collection.insert_one(funcionario)
+
+        # Exibir mensagem de sucesso
+        messagebox.showinfo("Sucesso", "Dados do funcionário salvos com sucesso!")
+        limpar_campos()  # Limpar campos após salvar os dados
+
+    except Exception as e:
+        messagebox.showerror("Erro", f"Ocorreu um erro ao salvar os dados: {e}")
+
+# Função para limpar os campos após o registro
+def limpar_campos():
+    cpf_entry.delete(0, tk.END)
+    nome_entry.delete(0, tk.END)
+    data_nascimento_entry.delete(0, tk.END)
+    logradouro_entry.delete(0, tk.END)
+    bairro_entry.delete(0, tk.END)
+    cidade_entry.delete(0, tk.END)
+    estado_entry.delete(0, tk.END)
+    cep_entry.delete(0, tk.END)
+    departamento_setor_entry.delete(0, tk.END)
+    telefone_contato_entry.delete(0, tk.END)
+    email_entry.delete(0, tk.END)
+    salario_entry.delete(0, tk.END)
+    beneficios_entry.delete(0, tk.END)
+    cargo_entry.delete(0, tk.END)
+    status_funcionario_combobox.set("")
+
+# Criando a interface gráfica
+try:
+    root = tk.Tk()
+
+    # Adiciona uma linha em branco antes do título
+    tk.Label(root, text="").pack()  # Linha em branco
+
+    root.title("Auto Posto Trevão - Cadastro de Funcionários")
+    root.geometry("500x900")
+
+    # Labels e Campos de Entrada
+    tk.Label(root, text="CPF:").pack()
+    cpf_entry = tk.Entry(root)
+    cpf_entry.pack()
+
+    tk.Label(root, text="Nome:").pack()
+    nome_entry = tk.Entry(root)
+    nome_entry.pack()
+
+    tk.Label(root, text="Data de Nascimento (YYYY-MM-DD):").pack()
+    data_nascimento_entry = tk.Entry(root)
+    data_nascimento_entry.pack()
+
+    tk.Label(root, text="Logradouro:").pack()
+    logradouro_entry = tk.Entry(root)
+    logradouro_entry.pack()
+
+    tk.Label(root, text="Bairro:").pack()
+    bairro_entry = tk.Entry(root)
+    bairro_entry.pack()
+
+    tk.Label(root, text="Cidade:").pack()
+    cidade_entry = tk.Entry(root)
+    cidade_entry.pack()
+
+    tk.Label(root, text="Estado:").pack()
+    estado_entry = tk.Entry(root)
+    estado_entry.pack()
+
+    tk.Label(root, text="CEP:").pack()
+    cep_entry = tk.Entry(root)
+    cep_entry.pack()
+
+    tk.Label(root, text="Departamento/Setor:").pack()
+    departamento_setor_entry = tk.Entry(root)
+    departamento_setor_entry.pack()
+
+    tk.Label(root, text="Telefone de Contato:").pack()
+    telefone_contato_entry = tk.Entry(root)
+    telefone_contato_entry.pack()
+
+    tk.Label(root, text="E-mail:").pack()
+    email_entry = tk.Entry(root)
+    email_entry.pack()
+
+    tk.Label(root, text="Salário:").pack()
+    salario_entry = tk.Entry(root)
+    salario_entry.pack()
+
+    tk.Label(root, text="Benefícios (separados por vírgula):").pack()
+    beneficios_entry = tk.Entry(root)
+    beneficios_entry.pack()
+
+    tk.Label(root, text="Cargo:").pack()
+    cargo_entry = tk.Entry(root)
+    cargo_entry.pack()
+
+    tk.Label(root, text="Status do Funcionário:").pack()
+    status_funcionario_combobox = ttk.Combobox(root, values=["Ativo", "Inativo"])
+    status_funcionario_combobox.pack()
+
+    # Adiciona duas linhas em branco
+    tk.Label(root, text="").pack()  # Primeira linha em branco
+
+    # Botão para salvar os dados
+    tk.Button(root, text="Salvar Funcionário", command=salvar_dados_funcionario).pack()
+
+    # Inicia o loop principal da interface gráfica
+    root.mainloop()
+
+except Exception as e:
+    print(f"Ocorreu um erro ao iniciar a interface gráfica: {e}")
+
+
+- LEITURA DO BANCO DE DADOS DOS FUNCINÁRIOS:
+
+from pymongo import MongoClient
+
+# Conectar ao MongoDB
+client = MongoClient("mongodb://localhost:27017/")  # Conexão local
+
+# Acessar o banco de dados 'empresa' e a coleção 'funcionarios'
+db = client['empresa']
+colecao = db['funcionarios']
+
+# Encontrar todos os registros da coleção
+registros = colecao.find()
+
+# Exibir os dados encontrados
+for registro in registros:
+    print(registro)
